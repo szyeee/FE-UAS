@@ -91,11 +91,13 @@ export default function OrderDetailPage() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    if (!id) return;
+    // normalize id to a single string (use first element if array)
+    const orderId = Array.isArray(id) ? id[0] : id;
+    if (!orderId) return;
     setLoading(true);
 
     // try fetch order from API
-    fetch(`/api/pesanan/${encodeURIComponent(id)}`)
+    fetch(`/api/pesanan/${encodeURIComponent(orderId)}`)
       .then(async (res) => {
         if (!res.ok) {
           // not found — still generate fake route so user can test tracking
@@ -114,8 +116,10 @@ export default function OrderDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    if (!id) return;
-    const r = generateFakeRoute(String(id), 5 + (String(id).length % 3));
+    const orderId = Array.isArray(id) ? id[0] : id;
+    if (!orderId) return;
+    const idStr = String(orderId);
+    const r = generateFakeRoute(idStr, 5 + (idStr.length % 3));
     setRoute(r);
     // active index = last step by default (simulate where it is)
     setActiveIndex(r.length - 1);
