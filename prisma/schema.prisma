@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Kategori {
+  ID_Kategori   Int      @id @default(autoincrement())
+  Nama_Kategori String
+  Deskripsi     String?
+  Created_At    DateTime @default(now())
+  Produk        Produk[]
+}
+
+model Produk {
+  ID_Produk    Int           @id @default(autoincrement())
+  Nama_Produk  String
+  Slug         String        @unique
+  Deskripsi    String?
+  Harga        Decimal       @db.Decimal(12, 2)
+  Stok         Int
+  Gambar       String?
+  ID_Kategori  Int
+  Created_At   DateTime      @default(now())
+  Promo        Promo[]
+  Ulasan       Ulasan[]
+  Kategori     Kategori      @relation(fields: [ID_Kategori], references: [ID_Kategori])
+  Item_Pesanan PesananItem[]
+  Keranjang    Keranjang[]
+}
+
+model Pengguna {
+  ID_Pengguna  Int         @id @default(autoincrement())
+  Email        String      @unique
+  Nama         String?
+  PasswordHash String?
+  Role         String      @default("customer")
+  Alamat       String?
+  No_Telepon   String?
+  Created_At   DateTime    @default(now())
+  Pesanan      Pesanan[]
+  Ulasan       Ulasan[]
+  Keranjang    Keranjang[]
+}
+
+model Pesanan {
+  ID_Pesanan    Int           @id @default(autoincrement())
+  ID_Pengguna   Int
+  Total         Decimal       @db.Decimal(12, 2)
+  Status        String        @default("pending")
+  Alamat        String
+  Metode_Bayar  String?
+  Tanggal_Pesan DateTime      @default(now())
+  Pengguna      Pengguna      @relation(fields: [ID_Pengguna], references: [ID_Pengguna])
+  Items         PesananItem[]
+}
+
+model PesananItem {
+  ID_Item    Int     @id @default(autoincrement())
+  ID_Pesanan Int
+  ID_Produk  Int
+  Kuantitas  Int
+  Harga_Unit Decimal @db.Decimal(12, 2)
+  Subtotal   Decimal @db.Decimal(12, 2)
+  Produk     Produk  @relation(fields: [ID_Produk], references: [ID_Produk])
+  Pesanan    Pesanan @relation(fields: [ID_Pesanan], references: [ID_Pesanan])
+}
+
+model Ulasan {
+  ID_Ulasan   Int       @id @default(autoincrement())
+  ID_Produk   Int
+  ID_Pengguna Int?
+  Rating      Int
+  Komentar    String?
+  Dibuat_Pada DateTime  @default(now())
+  Produk      Produk    @relation(fields: [ID_Produk], references: [ID_Produk])
+  Pengguna    Pengguna? @relation(fields: [ID_Pengguna], references: [ID_Pengguna])
+}
+
+model Promo {
+  ID_Promo      Int      @id @default(autoincrement())
+  Judul_Promo   String
+  Deskripsi     String?
+  Gambar        String?
+  Diskon        Int?
+  Tanggal_Mulai DateTime
+  Tanggal_Akhir DateTime
+  ID_Produk     Int?
+  Produk        Produk?  @relation(fields: [ID_Produk], references: [ID_Produk])
+}
+
+model Keranjang {
+  ID_Keranjang Int      @id @default(autoincrement())
+  ID_Pengguna  Int
+  ID_Produk    Int
+  Jumlah       Int
+  Ditambahkan  DateTime @default(now())
+  Pengguna     Pengguna @relation(fields: [ID_Pengguna], references: [ID_Pengguna])
+  Produk       Produk   @relation(fields: [ID_Produk], references: [ID_Produk])
+}
