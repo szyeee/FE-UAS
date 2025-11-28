@@ -49,8 +49,6 @@ async function main() {
   }
 
   console.log("✅ Kategori seeded");
-
-  // Ambil ID kategori
   const buket = kategoriCreated["Buket Bunga"];
   const snack = kategoriCreated["Buket Snack"];
   const parcel = kategoriCreated["Parcel Spesial"];
