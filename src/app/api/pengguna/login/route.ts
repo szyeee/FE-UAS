@@ -1,6 +1,6 @@
 // src/app/api/pengguna/login/route.ts
 import { NextResponse } from "next/server";
-import prisma from "../../../../lib/prisma"; // dari src/app/api/pengguna/login -> naik 4 -> src/lib
+import prisma from "../../../../lib/prisma"; 
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 

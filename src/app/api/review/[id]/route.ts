@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 
 type Params = { params: { id: string } };
 
-// GET: ambil semua ulasan untuk produk
 export async function GET(_: Request, { params }: Params) {
   try {
     const idRaw = params.id;
@@ -17,8 +16,6 @@ export async function GET(_: Request, { params }: Params) {
       where: { ID_Produk: pid },
       orderBy: { Dibuat_Pada: "desc" },
     });
-
-    // kembalikan array (normalize tanggal ke ISO)
     const out = ulasan.map(u => ({
       ID_Ulasan: u.ID_Ulasan,
       ID_Produk: u.ID_Produk,
@@ -35,7 +32,6 @@ export async function GET(_: Request, { params }: Params) {
   }
 }
 
-// POST: buat ulasan baru untuk produk
 export async function POST(req: Request, { params }: Params) {
   try {
     const idRaw = params.id;
@@ -45,7 +41,6 @@ export async function POST(req: Request, { params }: Params) {
     }
 
     const body = await req.json().catch(() => ({}));
-    // body expected: { rating, komentar, ID_Pengguna? }
     const rating = Number(body.rating ?? body.Rating);
     const komentar = body.komentar ?? body.Komentar ?? null;
     const userId = body.ID_Pengguna ? Number(body.ID_Pengguna) : undefined;
@@ -56,8 +51,6 @@ export async function POST(req: Request, { params }: Params) {
     if (!komentar || String(komentar).trim().length === 0) {
       return NextResponse.json({ error: "Komentar harus diisi" }, { status: 400 });
     }
-
-    // sementara: jika tidak ada userId, isi 1 (nanti diganti autentikasi sesungguhnya)
     const createData: any = {
       ID_Produk: pid,
       Rating: rating,
