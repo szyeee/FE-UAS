@@ -1,4 +1,5 @@
 // src/app/layout.tsx
+// Root Layout Component
 import "@/app/globals.css";
 import Navbar from "@/components/Navbar";
 import { PropsWithChildren } from "react";
