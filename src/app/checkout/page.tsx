@@ -25,7 +25,6 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    // read malibu_checkout first; if missing, fallback to malibu_cart
     try {
       const raw = localStorage.getItem("malibu_checkout") ?? localStorage.getItem("malibu_cart");
       const arr = raw ? JSON.parse(raw) : [];
@@ -110,8 +109,6 @@ export default function CheckoutPage() {
         console.error("POST /api/pesanan failed", data);
         throw new Error(data?.error || "Gagal membuat pesanan");
       }
-
-      // Ambil ID_Pesanan dari response. Beberapa backend mungkin menggunakan property berbeda.
       const createdId =
         data?.ID_Pesanan ?? data?.id ?? data?.ID ?? (data && data.ID ? data.ID : null);
 
@@ -127,24 +124,17 @@ export default function CheckoutPage() {
       } catch (err) {
         console.warn("gagal update malibu_cart", err);
       }
-
-      // clear checkout storage
       try {
         localStorage.removeItem("malibu_checkout");
       } catch {}
-
-      // simpan last order id untuk konfirmasi quick link
       try {
         if (createdId) localStorage.setItem("malibu_last_order_id", String(createdId));
       } catch {}
 
-      // notify navbar dan listeners
       try {
         window.dispatchEvent(new Event("cart_updated"));
         window.dispatchEvent(new Event("auth_updated"));
       } catch {}
-
-      // redirect ke detail pesanan (jika ada id) atau ke history
       if (createdId) {
         router.push(`/pesanan/${createdId}`);
       } else {

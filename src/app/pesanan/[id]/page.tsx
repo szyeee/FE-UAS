@@ -14,7 +14,6 @@ import { useParams, useRouter } from "next/navigation";
 /* ---------- Helpers ---------- */
 
 function seededRandom(seed: string) {
-    // simple deterministic RNG from string
     let h = 2166136261 >>> 0;
     for (let i = 0; i < seed.length; i++) {
         h ^= seed.charCodeAt(i);

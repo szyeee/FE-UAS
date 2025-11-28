@@ -36,7 +36,6 @@ export default function ProfilePage() {
     const payload = { Nama: form.Nama, Alamat: form.Alamat, No_Telepon: form.No_Telepon };
 
     try {
-      // coba PATCH endpoint; kalau tidak ada, simpan lokal
       const res = await fetch(`/api/pengguna/${user.ID_Pengguna}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -50,7 +49,6 @@ export default function ProfilePage() {
         setUser(newUser);
         alert("Profil diperbarui (server).");
       } else {
-        // fallback lokal
         const newUser = { ...user, ...payload };
         saveAuth(localStorage.getItem("malibu_auth") ?? localStorage.getItem("malibu_token"), newUser);
         setUser(newUser);
