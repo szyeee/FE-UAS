@@ -7,7 +7,6 @@ export type AuthUser = {
   Alamat?: string;
   No_Telepon?: string;
   Created_At?: string;
-  // tambahan field lain bila perlu
 };
 
 /**
@@ -35,7 +34,6 @@ export function saveAuth(token: string | null, user: any | null) {
   try {
     if (token) {
       localStorage.setItem(TOKEN_KEY, String(token));
-      // keep old key for compatibility
       localStorage.setItem(TOKEN_KEY_OLD, String(token));
     } else {
       localStorage.removeItem(TOKEN_KEY);
@@ -44,12 +42,8 @@ export function saveAuth(token: string | null, user: any | null) {
 
     if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
     else localStorage.removeItem(USER_KEY);
-
-    // notify app
     try { window.dispatchEvent(new Event("auth_updated")); } catch { /* ignore */ }
   } catch (e) {
-    // ignore storage errors
-    // console.error("saveAuth error", e);
   }
 }
 
@@ -101,18 +95,14 @@ export function performLogout() {
     localStorage.removeItem(TOKEN_KEY_OLD);
     localStorage.removeItem(USER_KEY);
 
-    // optional: clear checkout selection (leave cart if you prefer)
     try { localStorage.removeItem("malibu_checkout"); } catch {}
-
-    // notify app (use auth_updated so components listening update)
     try {
       window.dispatchEvent(new Event("auth_updated"));
       window.dispatchEvent(new Event("cart_updated"));
     } catch (e) {
-      // ignore
     }
   } catch (e) {
-    // ignore
+
   }
 }
 

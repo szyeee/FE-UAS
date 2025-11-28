@@ -22,11 +22,8 @@ export default function LoginPage() {
     const data = await res.json();
 
     if (!res.ok) {
-      // tampilkan pesan error dari API jika ada
       throw new Error(data?.error || "Login gagal");
     }
-
-    // sukses
     saveAuth(data.token, data.user);
     router.push("/");
   } catch (err:any) {
