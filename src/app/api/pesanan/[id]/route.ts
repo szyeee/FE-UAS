@@ -28,7 +28,6 @@ function sanitizePesanan(p: any) {
 
 export async function GET(req: Request, context: any) {
   try {
-    // Unwrap params (Next.js memberikan params sebagai Promise in some runtimes)
     const params = await Promise.resolve(context.params);
     const rawId = params?.id;
     const id = Number(rawId);

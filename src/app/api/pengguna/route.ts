@@ -1,9 +1,9 @@
+// src/app/api/pengguna/route.ts
 import { NextResponse } from "next/server";
 import prisma from "../../../lib/prisma";
 import bcrypt from "bcryptjs";
 
-export const runtime = "nodejs"; // pastikan pakai runtime Node
-
+export const runtime = "nodejs"; 
 type AnyObj = any;
 
 function sanitizePengguna(u: AnyObj) {

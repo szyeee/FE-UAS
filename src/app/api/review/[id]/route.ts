@@ -1,37 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-type AnyObj = any;
+type Params = { params: { id: string } };
 
-// helper sanitize
-function sanitizeUlasan(u: any) {
-  return {
-    ID_Ulasan: u.ID_Ulasan,
-    ID_Produk: u.ID_Produk,
-    ID_Pengguna: u.ID_Pengguna,
-    Rating: u.Rating,
-    Komentar: u.Komentar,
-    Dibuat_Pada: u.Dibuat_Pada ? new Date(u.Dibuat_Pada).toISOString() : null,
-  };
-}
-
-// NOTE: Next can pass params in different shapes depending runtime; jadi kita robust.
-function extractIdFromParams(params: any) {
-  if (!params) return null;
-  let idRaw = params.id ?? params.productId ?? null;
-  // if id is array (rare) take first
-  if (Array.isArray(idRaw)) idRaw = idRaw[0];
-  // if object with id property:
-  if (typeof idRaw === "object" && idRaw !== null && "toString" in idRaw) {
-    idRaw = String(idRaw);
-  }
-  return idRaw;
-}
-
-export async function GET(req: Request, context: any) {
+// GET: ambil semua ulasan untuk produk
+export async function GET(_: Request, { params }: Params) {
   try {
-    const params = await Promise.resolve(context?.params);
-    const idRaw = extractIdFromParams(params);
+    const idRaw = params.id;
     const pid = Number(idRaw);
 
     if (!idRaw || Number.isNaN(pid) || pid <= 0) {
@@ -45,7 +20,16 @@ export async function GET(req: Request, context: any) {
       orderBy: { Dibuat_Pada: "desc" },
     });
 
-    const out = ulasan.map(sanitizeUlasan);
+    // kembalikan array (normalize tanggal ke ISO)
+    const out = ulasan.map(u => ({
+      ID_Ulasan: u.ID_Ulasan,
+      ID_Produk: u.ID_Produk,
+      ID_Pengguna: u.ID_Pengguna,
+      Rating: u.Rating,
+      Komentar: u.Komentar,
+      Dibuat_Pada: u.Dibuat_Pada?.toISOString(),
+    }));
+
     return NextResponse.json(out);
   } catch (err) {
     console.error("[GET /api/review/:id] error:", err);
@@ -53,7 +37,8 @@ export async function GET(req: Request, context: any) {
   }
 }
 
-export async function POST(req: Request, context: any) {
+// POST: buat ulasan baru untuk produk
+export async function POST(req: Request, { params }: Params) {
   try {
     const params = await Promise.resolve(context?.params);
     const idRaw = extractIdFromParams(params);
@@ -76,7 +61,7 @@ export async function POST(req: Request, context: any) {
       return NextResponse.json({ error: "Komentar harus diisi" }, { status: 400 });
     }
 
-    // sementara isi ID_Pengguna jika tidak ada (demo)
+    // sementara: jika tidak ada userId, isi 1 (nanti diganti autentikasi sesungguhnya)
     const createData: any = {
       ID_Produk: pid,
       Rating: rating,

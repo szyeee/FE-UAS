@@ -1,4 +1,5 @@
 // src/app/tracking/page.tsx
+// tracking index page
 "use client";
 
 import { useState } from "react";
