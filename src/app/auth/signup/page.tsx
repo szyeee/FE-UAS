@@ -1,4 +1,5 @@
 // src/app/auth/signup/page.tsx
+// Sign Up Page Component
 
 "use client";
 import { useState } from "react";

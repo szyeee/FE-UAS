@@ -28,10 +28,9 @@ function extractIdFromParams(params: any) {
   return idRaw;
 }
 
-export async function GET(req: Request, context: any) {
+export async function GET(_: Request, { params }: Params) {
   try {
-    const params = await Promise.resolve(context?.params);
-    const idRaw = extractIdFromParams(params);
+    const idRaw = params.id;
     const pid = Number(idRaw);
 
     if (!idRaw || Number.isNaN(pid) || pid <= 0) {
@@ -44,8 +43,15 @@ export async function GET(req: Request, context: any) {
       where: { ID_Produk: pid },
       orderBy: { Dibuat_Pada: "desc" },
     });
+    const out = ulasan.map(u => ({
+      ID_Ulasan: u.ID_Ulasan,
+      ID_Produk: u.ID_Produk,
+      ID_Pengguna: u.ID_Pengguna,
+      Rating: u.Rating,
+      Komentar: u.Komentar,
+      Dibuat_Pada: u.Dibuat_Pada?.toISOString(),
+    }));
 
-    const out = ulasan.map(sanitizeUlasan);
     return NextResponse.json(out);
   } catch (err) {
     console.error("[GET /api/review/:id] error:", err);
@@ -53,7 +59,7 @@ export async function GET(req: Request, context: any) {
   }
 }
 
-export async function POST(req: Request, context: any) {
+export async function POST(req: Request, { params }: Params) {
   try {
     const params = await Promise.resolve(context?.params);
     const idRaw = extractIdFromParams(params);
@@ -75,8 +81,6 @@ export async function POST(req: Request, context: any) {
     if (!komentar || String(komentar).trim().length === 0) {
       return NextResponse.json({ error: "Komentar harus diisi" }, { status: 400 });
     }
-
-    // sementara isi ID_Pengguna jika tidak ada (demo)
     const createData: any = {
       ID_Produk: pid,
       Rating: rating,
